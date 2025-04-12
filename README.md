@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Orbit Patrimoine – MVP
+
+## Overview
+Orbit Patrimoine is a web-based conversational assistant designed for individual real estate investors. It provides neutral, educational, and contextual guidance throughout their investment journey, powered by AI and enriched with structured internal documentation.
+
+This MVP is built using Next.js with the App Router, TypeScript, Tailwind CSS, and integrates:
+- An authenticated AI chat interface (freemium tier)
+- A public blog with markdown-based content
+- Basic user onboarding and profile personalization
+
+---
+
+## Key Features
+
+### Freemium Chat
+- Conversational interface powered by OpenAI GPT-4
+- Personalized responses based on user profile data
+- Internal documentation suggested via links in responses
+
+### Blog / Knowledge Base
+- Publicly accessible articles in `.mdx` format
+- Organized by category (e.g., taxation, financing, strategy)
+- SEO-ready via Next.js static generation
+
+### User System
+- Sign up / Login (via Supabase authentication)
+- Simple profile: investment goal, level, and strategy
+- Profile used to enrich AI context
+
+---
+
+## Stack
+- **Framework**: Next.js (App Router, TypeScript)
+- **Styling**: Tailwind CSS
+- **Authentication & DB**: Supabase (PostgreSQL, Auth)
+- **AI**: OpenAI GPT-4 (via API)
+- **Content**: Static Markdown files (`.mdx`)
+- **Hosting**: Vercel
+
+---
+
+## Project Structure
+See [`project-structure.md`](./.cursor/project-structure.md) for the full file and folder breakdown.
+
+---
+
+## Prompts & AI
+See [`prompts.md`](./.cursor/prompts.md) for reusable AI prompt templates.
+
+- Prompts use contextual data from the user profile
+- Related blog content is suggested when relevant
+
+---
+
+## Development Rules
+See [`rules.md`](./.cursor/rules.md) for coding guidelines and project constraints.
+
+- Use only approved frameworks and tools
+- Write concise, modular, well-documented code
+- Keep all docs up to date during development
+
+---
 
 ## Getting Started
+1. Clone the repository and install dependencies:
+   ```bash
+   npm install
+   ```
+2. Set up environment variables in `.env`
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Roadmap
+See the Notion project planner for the detailed technical roadmap.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+_Last updated: April 2025_
