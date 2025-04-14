@@ -19,8 +19,9 @@ export default function LoginPage() {
 
     if (!error) {
       console.log('Connexion réussie, redirection vers le dashboard...')
-      router.push('/dashboard')
-      router.refresh()
+      // Attendre un court instant pour s'assurer que la session est bien établie
+      await new Promise(resolve => setTimeout(resolve, 100))
+      window.location.href = '/dashboard'
     } else {
       console.error('Erreur de connexion:', error)
     }
