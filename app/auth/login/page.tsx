@@ -4,7 +4,7 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import { AuthForm } from '@/app/components'
-import RedirectOnLogin from '../RedirectOnLogin'
+import { RedirectOnLogin } from '../RedirectOnLogin'
 
 export default function LoginPage() {
   const handleLogin = async (email: string, password: string) => {

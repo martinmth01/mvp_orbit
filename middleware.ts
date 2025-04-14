@@ -24,29 +24,17 @@ export async function middleware(req: NextRequest) {
 
     // Si l'utilisateur n'est pas connecté et essaie d'accéder au dashboard
     if (!session && req.nextUrl.pathname.startsWith('/dashboard')) {
-      console.log('Middleware - Redirecting to login (no session)')
-      const redirectUrl = new URL('/auth/login', req.url)
-      redirectUrl.searchParams.set('redirect', req.nextUrl.pathname)
-      return NextResponse.redirect(redirectUrl)
-    }
-
-    // Si l'utilisateur est connecté et essaie d'accéder aux pages d'auth
-    if (session && req.nextUrl.pathname.startsWith('/auth')) {
-      console.log('Middleware - Redirecting to dashboard (has session)')
-      const redirectUrl = new URL('/dashboard', req.url)
-      return NextResponse.redirect(redirectUrl)
+      console.log('Middleware - Protection de la route dashboard')
+      return NextResponse.redirect(new URL('/auth/login', req.url))
     }
 
     return res
   } catch (error) {
     console.error('Middleware error:', error)
-    // En cas d'erreur, on redirige vers la page de login
-    const redirectUrl = new URL('/auth/login', req.url)
-    redirectUrl.searchParams.set('error', 'Une erreur est survenue')
-    return NextResponse.redirect(redirectUrl)
+    return NextResponse.redirect(new URL('/auth/login', req.url))
   }
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/auth/:path*'],
+  matcher: ['/dashboard/:path*'],
 }
