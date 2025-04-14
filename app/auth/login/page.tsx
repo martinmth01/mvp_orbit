@@ -6,13 +6,22 @@ import { supabase } from '@/lib/supabaseClient'
 import { AuthForm } from '@/app/components'
 import { useEffect } from 'react'
 
+const waitForSession = async (maxTries = 10, delay = 150): Promise<any | null> => {
+  for (let i = 0; i < maxTries; i++) {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) return session
+    await new Promise((res) => setTimeout(res, delay))
+  }
+  return null
+}
+
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+      const session = await waitForSession()
       if (session) {
         const redirectTo = searchParams.get('redirect') || '/dashboard'
         router.push(redirectTo)
@@ -23,12 +32,11 @@ export default function LoginPage() {
 
   const handleLogin = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) throw error
 
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) throw new Error('Session not established')
+      const session = await waitForSession()
+      if (!session) throw new Error('Session was not ready after login')
 
       const redirectTo = searchParams.get('redirect') || '/dashboard'
       router.push(redirectTo)
