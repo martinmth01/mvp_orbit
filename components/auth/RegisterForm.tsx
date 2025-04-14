@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Button, Input, Card } from '../ui';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
+import { createUserProfile } from '@/lib/userProfile';
 
 export default function RegisterForm() {
   const [email, setEmail] = useState('');
@@ -32,16 +33,33 @@ export default function RegisterForm() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      console.log('Tentative d\'inscription avec email:', email);
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
 
       if (error) throw error;
+      
+      console.log('Inscription réussie:', data);
+
+      // Créer un profil utilisateur si l'inscription a réussi
+      if (data.user) {
+        console.log('Création du profil utilisateur...');
+        const { error: profileError } = await createUserProfile(data.user.id, {
+          email: data.user.email || email,
+        });
+        
+        if (profileError) {
+          console.error('Erreur lors de la création du profil:', profileError);
+          // Ne pas bloquer l'inscription si la création de profil échoue
+        }
+      }
 
       // Redirection vers la page de connexion avec un message
       router.push('/auth/login?registered=true');
     } catch (error: any) {
+      console.error('Erreur d\'inscription:', error);
       setError(error.message || 'Une erreur est survenue lors de l\'inscription');
     } finally {
       setLoading(false);

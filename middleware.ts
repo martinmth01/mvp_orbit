@@ -22,10 +22,20 @@ export async function middleware(req: NextRequest) {
       console.error('Middleware - Auth error:', error)
     }
 
+    // Protection des routes authentifiées
+    const isAuthRoute = req.nextUrl.pathname.startsWith('/auth')
+    const isDashboardRoute = req.nextUrl.pathname.startsWith('/dashboard')
+
     // Si l'utilisateur n'est pas connecté et essaie d'accéder au dashboard
-    if (!session && req.nextUrl.pathname.startsWith('/dashboard')) {
-      console.log('Middleware - Protection de la route dashboard')
+    if (!session && isDashboardRoute) {
+      console.log('Middleware - Protection de la route dashboard, redirection vers login')
       return NextResponse.redirect(new URL('/auth/login', req.url))
+    }
+
+    // Si l'utilisateur est connecté et essaie d'accéder aux pages d'authentification
+    if (session && isAuthRoute) {
+      console.log('Middleware - Utilisateur déjà connecté, redirection vers dashboard')
+      return NextResponse.redirect(new URL('/dashboard', req.url))
     }
 
     return res
