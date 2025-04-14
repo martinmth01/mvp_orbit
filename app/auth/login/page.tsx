@@ -10,28 +10,27 @@ export default function LoginPage() {
 
   const handleLogin = async (email: string, password: string) => {
     console.log('Attempting login...')
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    console.log('Login result:', { data, error })
+      console.log('Login result:', { data, error })
 
-    if (!error) {
-      console.log('Login successful. Redirecting to dashboard...')
-      // Attendre que la session soit établie
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        // Utiliser window.location pour une redirection complète
-        window.location.href = '/dashboard'
+      if (!error) {
+        console.log('Login successful. Redirecting to dashboard...')
+        // Forcer un rechargement complet de la page
+        document.location.href = '/dashboard'
       } else {
-        console.error('No session after successful login')
+        console.error('Login error:', error)
       }
-    } else {
-      console.error('Login error:', error)
-    }
 
-    return { error }
+      return { error }
+    } catch (err) {
+      console.error('Unexpected error during login:', err)
+      return { error: err }
+    }
   }
 
   return <AuthForm type="login" onSubmit={handleLogin} />
