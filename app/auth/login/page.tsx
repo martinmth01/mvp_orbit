@@ -38,12 +38,8 @@ export default function LoginPage() {
       }
       
       console.log('Connexion réussie:', data)
-      // Rafraîchir le router pour mettre à jour le middleware
-      router.refresh()
-      // Attendre un court instant pour s'assurer que la session est mise à jour
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 100)
+      // Utiliser window.location pour une redirection directe
+      window.location.href = '/dashboard'
     } catch (err) {
       console.error('Erreur détaillée:', err)
       setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de la connexion')

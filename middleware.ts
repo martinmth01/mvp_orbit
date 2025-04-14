@@ -17,6 +17,10 @@ export async function middleware(req: NextRequest) {
     console.log('Middleware - User Email:', session.user.email)
   }
 
+  // Ajouter des en-têtes pour éviter la mise en cache
+  res.headers.set('Cache-Control', 'no-store, max-age=0')
+  res.headers.set('Pragma', 'no-cache')
+
   // Si l'utilisateur n'est pas connecté et essaie d'accéder au dashboard
   if (!session && req.nextUrl.pathname.startsWith('/dashboard')) {
     console.log('Redirection vers login - Utilisateur non connecté')
