@@ -9,21 +9,20 @@ export default function LoginPage() {
   const router = useRouter()
 
   const handleLogin = async (email: string, password: string) => {
-    console.log('Tentative de connexion...')
+    console.log('Attempting login...')
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
-    console.log('Résultat de la connexion:', { data, error })
+    console.log('Login result:', { data, error })
 
-    if (!error) {
-      console.log('Connexion réussie, redirection vers le dashboard...')
-      // Attendre un court instant pour s'assurer que la session est bien établie
+    if (!error && data?.session?.access_token) {
+      console.log('Login successful. Redirecting to dashboard...')
       await new Promise(resolve => setTimeout(resolve, 100))
-      window.location.href = '/dashboard'
+      router.push('/dashboard')
     } else {
-      console.error('Erreur de connexion:', error)
+      console.error('Login error:', error)
     }
 
     return { error }
