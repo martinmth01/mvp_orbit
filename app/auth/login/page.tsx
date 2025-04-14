@@ -38,10 +38,11 @@ export default function LoginPage() {
       }
       
       console.log('Connexion réussie:', data)
-      // Attendre un court instant puis rediriger
+      // Rafraîchir le router et attendre avant de rediriger
+      router.refresh()
       setTimeout(() => {
-        window.location.href = '/dashboard'
-      }, 100)
+        router.push('/dashboard')
+      }, 1000)
     } catch (err) {
       console.error('Erreur détaillée:', err)
       setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de la connexion')
