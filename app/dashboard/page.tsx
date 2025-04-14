@@ -1,81 +1,47 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
-import LogoutButton from '@/app/components/LogoutButton'
+import { useRouter } from 'next/navigation'
 
 export default function DashboardPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Vérifier si l'utilisateur est connecté
-    const checkUser = async () => {
-      try {
-        const { data: { user }, error } = await supabase.auth.getUser()
-        
-        if (error) throw error
-        
-        if (!user) {
-          // Si pas d'utilisateur, rediriger vers la page de connexion
-          router.push('/auth/login')
-          return
-        }
-        
-        setUser(user)
-      } catch (error) {
-        console.error('Erreur lors de la vérification de l\'utilisateur:', error)
-        router.push('/auth/login')
-      } finally {
-        setLoading(false)
-      }
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
     }
+    getUser()
+  }, [])
 
-    checkUser()
-  }, [router])
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600">Chargement...</p>
-      </div>
-    )
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/')
+    router.refresh()
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold">Orbit Patrimoine</h1>
-            </div>
-            <div className="flex items-center">
-              <span className="mr-4 text-gray-600">{user?.email}</span>
-              <LogoutButton />
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+          >
+            Se déconnecter
+          </button>
         </div>
-      </nav>
-
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Mon profil</h2>
-            {/* Contenu du profil à venir */}
+        {user && (
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-xl font-semibold mb-4">Informations utilisateur</h2>
+            <p><strong>Email:</strong> {user.email}</p>
+            <p><strong>ID:</strong> {user.id}</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Mes conversations</h2>
-            {/* Liste des conversations à venir */}
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Ressources</h2>
-            {/* Liste des ressources à venir */}
-          </div>
-        </div>
-      </main>
+        )}
+      </div>
     </div>
-  );
+  )
 }
