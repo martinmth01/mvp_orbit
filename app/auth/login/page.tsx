@@ -18,6 +18,13 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
 
+    // Validation des champs
+    if (!email || !password) {
+      setError('Veuillez remplir tous les champs')
+      setLoading(false)
+      return
+    }
+
     try {
       console.log('Tentative de connexion avec:', email)
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -31,8 +38,12 @@ export default function LoginPage() {
       }
       
       console.log('Connexion réussie:', data)
-      // Utilisation de router.push au lieu de window.location
-      router.push('/dashboard')
+      // Rafraîchir le router pour mettre à jour le middleware
+      router.refresh()
+      // Attendre un court instant pour s'assurer que la session est mise à jour
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 100)
     } catch (err) {
       console.error('Erreur détaillée:', err)
       setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de la connexion')
@@ -64,9 +75,11 @@ export default function LoginPage() {
               id="email"
               type="email"
               required
+              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              placeholder="votre@email.com"
             />
           </div>
           <div>
@@ -77,9 +90,11 @@ export default function LoginPage() {
               id="password"
               type="password"
               required
+              minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              placeholder="Votre mot de passe"
             />
           </div>
           <button

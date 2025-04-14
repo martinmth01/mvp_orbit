@@ -12,17 +12,23 @@ export async function middleware(req: NextRequest) {
 
   console.log('Middleware - URL:', req.nextUrl.pathname)
   console.log('Middleware - Session:', session ? 'Présente' : 'Absente')
+  if (session) {
+    console.log('Middleware - User ID:', session.user.id)
+    console.log('Middleware - User Email:', session.user.email)
+  }
 
   // Si l'utilisateur n'est pas connecté et essaie d'accéder au dashboard
   if (!session && req.nextUrl.pathname.startsWith('/dashboard')) {
     console.log('Redirection vers login - Utilisateur non connecté')
-    return NextResponse.redirect(new URL('/auth/login', req.url))
+    const redirectUrl = new URL('/auth/login', req.url)
+    return NextResponse.redirect(redirectUrl)
   }
 
   // Si l'utilisateur est connecté et essaie d'accéder aux pages d'auth
   if (session && (req.nextUrl.pathname.startsWith('/auth'))) {
     console.log('Redirection vers dashboard - Utilisateur déjà connecté')
-    return NextResponse.redirect(new URL('/dashboard', req.url))
+    const redirectUrl = new URL('/dashboard', req.url)
+    return NextResponse.redirect(redirectUrl)
   }
 
   return res
