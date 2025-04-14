@@ -10,6 +10,7 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
   const isRedirectingRef = useRef(false)
   const lastEventRef = useRef<string | null>(null)
+  const initialCheckDoneRef = useRef(false)
 
   useEffect(() => {
     // Vérifier la session actuelle
@@ -19,13 +20,16 @@ export function useAuth() {
         setSession(session)
         setUser(session?.user ?? null)
         
-        // Si l'utilisateur est connecté et n'est pas sur le dashboard, rediriger
-        if (session && window.location.pathname !== '/dashboard') {
+        // Ne rediriger que si c'est la première vérification et que l'utilisateur est connecté
+        if (!initialCheckDoneRef.current && session && window.location.pathname !== '/dashboard') {
           console.log('Session existante détectée, redirection vers le dashboard')
           window.location.href = '/dashboard'
         }
+        
+        initialCheckDoneRef.current = true
       } catch (error) {
         console.error('Erreur lors de la vérification de la session:', error)
+        initialCheckDoneRef.current = true
       } finally {
         setLoading(false)
       }

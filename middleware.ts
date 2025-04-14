@@ -38,6 +38,7 @@ export async function middleware(req: NextRequest) {
   return res
 }
 
+// Limiter le middleware aux routes spécifiques pour éviter les boucles
 export const config = {
   matcher: ['/dashboard/:path*', '/auth/:path*'],
 } 
