@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
-import LoginButton from '@/app/components/LoginButton'
+import { LoginButton } from '@/app/components'
 
 export default function Home() {
   const [dbTest, setDbTest] = useState<string>('Test de connexion en cours...')

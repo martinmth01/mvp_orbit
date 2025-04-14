@@ -3,7 +3,7 @@
 
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
-import AuthForm from '@/app/components/AuthForm'
+import { AuthForm } from '@/app/components'
 
 export default function RegisterPage() {
   const router = useRouter()

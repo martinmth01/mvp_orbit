@@ -1,26 +1,15 @@
-// app/auth/register/page.tsx
+// app/components/LoginButton.tsx
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabaseClient'
-import AuthForm from '@/app/components/AuthForm'
+import Link from 'next/link'
 
-export default function RegisterPage() {
-  const router = useRouter()
-
-  const handleRegister = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    })
-
-    if (!error) {
-      router.push('/dashboard')
-      router.refresh()
-    }
-
-    return { error }
-  }
-
-  return <AuthForm type="register" onSubmit={handleRegister} />
+export default function LoginButton() {
+  return (
+    <Link
+      href="/auth/login"
+      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+    >
+      Se connecter
+    </Link>
+  )
 }
