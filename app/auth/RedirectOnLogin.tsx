@@ -16,7 +16,23 @@ export function RedirectOnLogin() {
         router.push('/dashboard')
       }
     }
+
+    // Vérification initiale
     check()
+
+    // Écouter les changements d'état d'authentification
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event, session)
+      if (event === 'SIGNED_IN' && session) {
+        console.log('Redirection triggered by auth state change')
+        router.push('/dashboard')
+      }
+    })
+
+    // Nettoyage
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [router])
 
   return null
