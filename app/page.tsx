@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
+import { MainLayout } from '@/components/layout'
+import { Card } from '@/components/ui'
+import Link from 'next/link'
 
 export default function Home() {
   const [dbTest, setDbTest] = useState<string>('Test de connexion en cours...')
@@ -29,20 +32,58 @@ export default function Home() {
   }, [])
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">
-          Orbit Patrimoine
-        </h1>
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">
-            Test Supabase
-          </h2>
-          <p className="text-gray-600">
-            {dbTest}
+    <MainLayout>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Orbit Patrimoine
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Votre assistant conversationnel pour investisseurs immobiliers. Gérez vos propriétés, 
+            obtenez des conseils personnalisés et optimisez votre portefeuille immobilier.
           </p>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          <Card title="Gestion de propriétés" className="text-center">
+            <p className="text-gray-600 mb-4">
+              Ajoutez, modifiez et suivez vos propriétés en un seul endroit.
+            </p>
+            <Link href="/dashboard" className="text-blue-600 hover:text-blue-800 font-medium">
+              Accéder au tableau de bord →
+            </Link>
+          </Card>
+
+          <Card title="Conseils personnalisés" className="text-center">
+            <p className="text-gray-600 mb-4">
+              Recevez des recommandations adaptées à votre situation et vos objectifs.
+            </p>
+            <Link href="/chat" className="text-blue-600 hover:text-blue-800 font-medium">
+              Démarrer une conversation →
+            </Link>
+          </Card>
+
+          <Card title="Ressources" className="text-center">
+            <p className="text-gray-600 mb-4">
+              Accédez à des articles et guides pour approfondir vos connaissances.
+            </p>
+            <Link href="/blog" className="text-blue-600 hover:text-blue-800 font-medium">
+              Explorer les ressources →
+            </Link>
+          </Card>
+        </div>
+
+        <Card className="bg-blue-50 border-blue-100">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-blue-800 mb-2">
+              Test de connexion à la base de données
+            </h2>
+            <p className="text-blue-600">
+              {dbTest}
+            </p>
+          </div>
+        </Card>
       </div>
-    </main>
+    </MainLayout>
   )
 }
