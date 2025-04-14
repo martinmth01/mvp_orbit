@@ -38,8 +38,10 @@ export default function LoginPage() {
       }
       
       console.log('Connexion réussie:', data)
-      // Utiliser window.location pour une redirection directe
-      window.location.href = '/dashboard'
+      // Attendre que la session soit bien établie
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 500)
     } catch (err) {
       console.error('Erreur détaillée:', err)
       setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de la connexion')
