@@ -1,18 +1,13 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabaseClient'
+import { useAuth } from '@/app/hooks/useAuth'
 
 export default function LogoutButton() {
-  const router = useRouter()
+  const { signOut } = useAuth()
 
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut()
-      if (error) throw error
-      
-      // Redirection vers la page d'accueil après déconnexion
-      router.push('/')
+      await signOut()
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error)
     }

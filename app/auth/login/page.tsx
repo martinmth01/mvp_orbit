@@ -2,12 +2,13 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabaseClient'
 import AuthNav from '@/app/components/AuthNav'
 import Link from 'next/link'
+import { useAuth } from '@/app/hooks/useAuth'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { signIn } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -27,22 +28,15 @@ export default function LoginPage() {
 
     try {
       console.log('Tentative de connexion avec:', email)
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      const { error } = await signIn(email, password)
 
       if (error) {
-        console.error('Erreur de connexion:', error.message)
+        console.error('Erreur de connexion:', error)
         throw error
       }
       
-      console.log('Connexion réussie:', data)
-      // Rafraîchir le router et attendre avant de rediriger
-      router.refresh()
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 1000)
+      // La redirection sera gérée par le hook useAuth
+      console.log('Connexion réussie, attente de la redirection...')
     } catch (err) {
       console.error('Erreur détaillée:', err)
       setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de la connexion')
