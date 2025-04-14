@@ -1,111 +1,84 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient';
+import { createSupabaseBrowserClient } from '../supabaseClient';
+import { User, AuthError } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 
-export function useAuth() {
-  const [user, setUser] = useState<any>(null);
+export const useAuth = () => {
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<AuthError | null>(null);
   const router = useRouter();
+  const supabase = createSupabaseBrowserClient();
 
-  // Initialisation et écoute des changements d'état
   useEffect(() => {
-    let mounted = true;
-
     // Vérifier la session actuelle
-    const checkSession = async () => {
+    const checkUser = async () => {
       try {
-        setLoading(true);
-        
         const { data: { session }, error } = await supabase.auth.getSession();
-        
         if (error) throw error;
-        
-        if (mounted) {
-          setUser(session?.user || null);
-          setLoading(false);
-        }
+        setUser(session?.user ?? null);
       } catch (err) {
-        console.error('Erreur lors de la vérification de la session:', err);
-        if (mounted) {
-          setError(err);
-          setLoading(false);
-        }
+        setError(err as AuthError);
+      } finally {
+        setLoading(false);
       }
     };
 
-    // Vérification initiale
-    checkSession();
+    checkUser();
 
     // Écouter les changements d'authentification
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('Événement d\'authentification:', event, session?.user?.id);
-        
-        if (!mounted) return;
-        
-        setUser(session?.user || null);
-        setLoading(false);
-        
-        // Actions spécifiques selon l'événement
-        if (event === 'SIGNED_IN') {
-          console.log('Utilisateur connecté');
-        } else if (event === 'SIGNED_OUT') {
-          console.log('Utilisateur déconnecté');
-        }
-      }
-    );
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
     return () => {
-      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
 
-  // Fonctions d'authentification
   const signIn = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
+      setLoading(true);
+      setError(null);
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      
-      return { data, error: null };
+      return data;
     } catch (err) {
-      console.error('Erreur de connexion:', err);
-      return { data: null, error: err };
+      setError(err as AuthError);
+      throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
   const signUp = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-      
+      setLoading(true);
+      setError(null);
+      const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
-      
-      return { data, error: null };
+      return data;
     } catch (err) {
-      console.error('Erreur d\'inscription:', err);
-      return { data: null, error: err };
+      setError(err as AuthError);
+      throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
   const signOut = async () => {
     try {
+      setLoading(true);
+      setError(null);
       const { error } = await supabase.auth.signOut();
-      
       if (error) throw error;
-      
       router.push('/auth/login');
-      return { error: null };
     } catch (err) {
-      console.error('Erreur de déconnexion:', err);
-      return { error: err };
+      setError(err as AuthError);
+      throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -118,4 +91,4 @@ export function useAuth() {
     signOut,
     isAuthenticated: !!user,
   };
-} 
+}; 

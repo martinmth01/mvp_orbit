@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/hooks';
 import { useRouter } from 'next/navigation';
 
@@ -10,17 +10,22 @@ interface AuthGuardProps {
 
 export default function AuthGuard({ children }: AuthGuardProps) {
   const { isAuthenticated, loading, user } = useAuth();
-  const router = useRouter();
+  const [content, setContent] = useState<React.ReactNode | null>(null);
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      console.log('AuthGuard - Utilisateur non authentifié, redirection vers login');
-      router.push('/auth/login');
-    } else if (user) {
-      console.log('AuthGuard - Utilisateur authentifié:', user.id);
+    // Afficher le contenu seulement si l'utilisateur est authentifié
+    if (!loading) {
+      if (isAuthenticated) {
+        console.log('AuthGuard - Utilisateur authentifié:', user?.id);
+        setContent(children);
+      } else {
+        console.log('AuthGuard - Utilisateur non authentifié');
+        setContent(null);
+      }
     }
-  }, [loading, isAuthenticated, router, user]);
+  }, [loading, isAuthenticated, children, user]);
 
+  // Afficher un indicateur de chargement pendant la vérification
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -29,5 +34,6 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     );
   }
 
-  return isAuthenticated ? <>{children}</> : null;
+  // Rendre le contenu (qui sera null si non authentifié)
+  return <>{content}</>;
 } 

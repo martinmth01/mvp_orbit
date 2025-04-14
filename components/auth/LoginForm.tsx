@@ -1,74 +1,55 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button, Input, Card } from '../ui';
-import { supabase } from '@/lib/supabaseClient';
-import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/hooks/useAuth';
+import { useSearchParams } from 'next/navigation';
+import { createUserProfile, getUserProfile } from '@/lib/userProfile';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [formError, setFormError] = useState<string | null>(null);
+  const { signIn, loading, error: authError } = useAuth();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get('returnTo') || '/dashboard';
 
-  // Vérifier si l'utilisateur est déjà connecté au chargement du composant
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log('Session initiale:', session);
-      if (session) {
-        console.log('Utilisateur déjà connecté, redirection...');
-        router.push('/dashboard');
+  // Fonction pour vérifier et créer le profil utilisateur si nécessaire
+  const ensureUserProfile = async (userId: string, userEmail: string) => {
+    try {
+      const { data: profile, error: profileError } = await getUserProfile(userId);
+      
+      if (profileError || !profile) {
+        await createUserProfile(userId, { email: userEmail });
       }
-    };
-
-    checkSession();
-  }, [router]);
+    } catch (error) {
+      // Ne pas bloquer l'authentification si la création du profil échoue
+      console.error('Erreur lors de la vérification/création du profil:', error);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
+    setFormError(null);
 
     try {
-      console.log('Tentative de connexion avec:', email);
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
+      const { user } = await signIn(email, password);
       
-      console.log('Connexion réussie:', data);
-      
-      // Attendre que la session soit disponible
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) throw sessionError;
-      
-      console.log('Session après connexion:', session);
-      
-      if (session) {
-        // Forcer la redirection via window.location pour contourner les problèmes potentiels
-        window.location.href = '/dashboard';
-      } else {
-        throw new Error('Session non disponible après la connexion');
+      if (user) {
+        await ensureUserProfile(user.id, user.email || email);
+        window.location.href = returnTo;
       }
     } catch (error: any) {
-      console.error('Erreur de connexion:', error);
-      setError(error.message || 'Une erreur est survenue lors de la connexion');
-    } finally {
-      setLoading(false);
+      setFormError(error.message || 'Une erreur est survenue lors de la connexion');
     }
   };
 
   return (
     <Card title="Connexion" className="max-w-md mx-auto">
       <form onSubmit={handleLogin} className="space-y-4">
-        {error && (
+        {(formError || authError) && (
           <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">
-            {error}
+            {formError || authError?.message}
           </div>
         )}
 
@@ -86,15 +67,17 @@ export default function LoginForm() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Votre mot de passe"
+          placeholder="••••••••"
           required
         />
 
-        <div className="pt-2">
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? 'Connexion en cours...' : 'Se connecter'}
-          </Button>
-        </div>
+        <Button
+          type="submit"
+          disabled={loading}
+          className="w-full"
+        >
+          {loading ? 'Connexion en cours...' : 'Se connecter'}
+        </Button>
       </form>
     </Card>
   );

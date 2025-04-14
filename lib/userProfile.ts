@@ -27,6 +27,16 @@ export async function createUserProfile(userId: string, userData: {
       return { data: existingProfile, error: null };
     }
     
+    // Vérification de l'authentification avant insertion
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      console.error('Aucune session active pour créer le profil utilisateur');
+      return { 
+        data: null, 
+        error: new Error('Utilisateur non authentifié. La création de profil sera effectuée lors de la prochaine connexion.') 
+      };
+    }
+    
     // Créer le profil s'il n'existe pas
     const { data, error } = await supabase
       .from('user_profiles')

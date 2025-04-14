@@ -1,5 +1,6 @@
 // lib/supabaseClient.ts
 import { createClient } from '@supabase/supabase-js'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -8,14 +9,23 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
+// Client optimisé pour Next.js qui utilise les cookies au lieu de localStorage
+export const createSupabaseBrowserClient = () => {
+  return createClientComponentClient()
+}
+
+// Client avec localStorage pour le côté client uniquement
+const isBrowser = typeof window !== 'undefined'
+
+// Créer le client avec localStorage (pour maintenir la compatibilité avec le code existant)
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
     flowType: 'pkce',
-    debug: true,
-    storage: {
+    debug: process.env.NODE_ENV === 'development',
+    storage: isBrowser ? {
       getItem: (key) => {
         try {
           const itemStr = localStorage.getItem(key)
@@ -28,7 +38,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
           }
           return item.value
         } catch (error) {
-          console.error('Error reading from localStorage:', error)
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Error reading from localStorage:', error)
+          }
           return null
         }
       },
@@ -40,16 +52,20 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
           }
           localStorage.setItem(key, JSON.stringify(item))
         } catch (error) {
-          console.error('Error writing to localStorage:', error)
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Error writing to localStorage:', error)
+          }
         }
       },
       removeItem: (key) => {
         try {
           localStorage.removeItem(key)
         } catch (error) {
-          console.error('Error removing from localStorage:', error)
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Error removing from localStorage:', error)
+          }
         }
       }
-    }
+    } : undefined  // Pas de stockage pour le SSR
   }
 })
