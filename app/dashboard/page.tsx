@@ -8,45 +8,67 @@ export default function DashboardPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [sessionChecked, setSessionChecked] = useState(false)
 
   useEffect(() => {
+    let mounted = true
+
     const getUser = async () => {
       try {
         // Attendre que la session soit initialisée
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
         
+        if (!mounted) return
+
         if (sessionError) {
           console.error('Erreur lors de la récupération de la session:', sessionError)
-          router.push('/auth/login')
+          if (!sessionChecked) {
+            router.push('/auth/login')
+          }
           return
         }
 
         if (!session) {
           console.log('Aucune session trouvée, redirection vers login')
-          router.push('/auth/login')
+          if (!sessionChecked) {
+            router.push('/auth/login')
+          }
           return
         }
 
         // Récupérer les informations de l'utilisateur
         const { data: { user }, error: userError } = await supabase.auth.getUser()
         
+        if (!mounted) return
+
         if (userError) {
           console.error('Erreur lors de la récupération de l\'utilisateur:', userError)
-          router.push('/auth/login')
+          if (!sessionChecked) {
+            router.push('/auth/login')
+          }
           return
         }
 
         setUser(user)
+        setSessionChecked(true)
       } catch (error) {
         console.error('Erreur inattendue:', error)
-        router.push('/auth/login')
+        if (!sessionChecked) {
+          router.push('/auth/login')
+        }
       } finally {
-        setLoading(false)
+        if (mounted) {
+          setLoading(false)
+        }
       }
     }
 
     getUser()
-  }, [router])
+
+    return () => {
+      mounted = false
+    }
+  }, [router, sessionChecked])
 
   const handleLogout = async () => {
     try {

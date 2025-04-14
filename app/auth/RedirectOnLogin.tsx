@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 
 export function RedirectOnLogin() {
   const router = useRouter()
+  const [shouldRedirect, setShouldRedirect] = useState(false)
 
   useEffect(() => {
     const check = async () => {
@@ -13,7 +14,7 @@ export function RedirectOnLogin() {
       console.log('RedirectOnLogin session:', session)
       if (session) {
         console.log('Redirection triggered')
-        router.push('/dashboard')
+        setShouldRedirect(true)
       }
     }
 
@@ -25,7 +26,7 @@ export function RedirectOnLogin() {
       console.log('Auth state changed:', event, session)
       if (event === 'SIGNED_IN' && session) {
         console.log('Redirection triggered by auth state change')
-        router.push('/dashboard')
+        setShouldRedirect(true)
       }
     })
 
@@ -33,7 +34,16 @@ export function RedirectOnLogin() {
     return () => {
       subscription.unsubscribe()
     }
-  }, [router])
+  }, [])
+
+  // Effet séparé pour la redirection
+  useEffect(() => {
+    if (shouldRedirect) {
+      console.log('Executing redirect to dashboard')
+      router.push('/dashboard')
+      router.refresh()
+    }
+  }, [shouldRedirect, router])
 
   return null
 } 
