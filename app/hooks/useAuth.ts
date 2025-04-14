@@ -8,6 +8,7 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isRedirecting, setIsRedirecting] = useState(false)
 
   useEffect(() => {
     // Vérifier la session actuelle
@@ -32,12 +33,28 @@ export function useAuth() {
         setSession(session)
         setUser(session?.user ?? null)
         
-        if (event === 'SIGNED_IN') {
+        if (event === 'SIGNED_IN' && !isRedirecting) {
           console.log('Utilisateur connecté, redirection vers le dashboard')
-          router.push('/dashboard')
-        } else if (event === 'SIGNED_OUT') {
+          setIsRedirecting(true)
+          
+          // Vérifier si nous sommes déjà sur le dashboard
+          if (window.location.pathname !== '/dashboard') {
+            // Attendre un court instant avant de rediriger
+            setTimeout(() => {
+              window.location.href = '/dashboard'
+            }, 100)
+          }
+        } else if (event === 'SIGNED_OUT' && !isRedirecting) {
           console.log('Utilisateur déconnecté, redirection vers la page d\'accueil')
-          router.push('/')
+          setIsRedirecting(true)
+          
+          // Vérifier si nous sommes déjà sur la page d'accueil
+          if (window.location.pathname !== '/') {
+            // Attendre un court instant avant de rediriger
+            setTimeout(() => {
+              window.location.href = '/'
+            }, 100)
+          }
         }
       }
     )
@@ -45,7 +62,7 @@ export function useAuth() {
     return () => {
       subscription.unsubscribe()
     }
-  }, [router])
+  }, [isRedirecting])
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -66,7 +83,11 @@ export function useAuth() {
     try {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
-      router.push('/')
+      
+      // Vérifier si nous sommes déjà sur la page d'accueil
+      if (window.location.pathname !== '/') {
+        window.location.href = '/'
+      }
     } catch (error) {
       console.error('Erreur de déconnexion:', error)
     }
