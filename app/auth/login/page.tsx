@@ -17,10 +17,16 @@ export default function LoginPage() {
 
     console.log('Login result:', { data, error })
 
-    if (!error && data?.session?.access_token) {
+    if (!error) {
       console.log('Login successful. Redirecting to dashboard...')
-      await new Promise(resolve => setTimeout(resolve, 100))
-      router.push('/dashboard')
+      // Attendre que la session soit établie
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        // Utiliser window.location pour une redirection complète
+        window.location.href = '/dashboard'
+      } else {
+        console.error('No session after successful login')
+      }
     } else {
       console.error('Login error:', error)
     }
