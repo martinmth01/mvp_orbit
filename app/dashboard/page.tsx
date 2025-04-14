@@ -1,116 +1,89 @@
 'use client'
 
+import { AuthGuard } from '@/components/auth'
+import { MainLayout } from '@/components/layout'
+import { Card, Button } from '@/components/ui'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
-import { useRouter } from 'next/navigation'
+import { PropertyData } from '@/types'
+import Link from 'next/link'
 
 export default function DashboardPage() {
-  const router = useRouter()
-  const [user, setUser] = useState<any>(null)
+  const [properties, setProperties] = useState<PropertyData[]>([])
   const [loading, setLoading] = useState(true)
-  const [sessionChecked, setSessionChecked] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    let mounted = true
-
-    const getUser = async () => {
+    async function fetchProperties() {
       try {
-        // Attendre que la session soit initialisée
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-        
-        if (!mounted) return
+        const { data, error } = await supabase
+          .from('properties')
+          .select('*')
+          .order('created_at', { ascending: false })
 
-        if (sessionError) {
-          console.error('Erreur lors de la récupération de la session:', sessionError)
-          if (!sessionChecked) {
-            router.push('/auth/login')
-          }
-          return
-        }
-
-        if (!session) {
-          console.log('Aucune session trouvée, redirection vers login')
-          if (!sessionChecked) {
-            router.push('/auth/login')
-          }
-          return
-        }
-
-        // Récupérer les informations de l'utilisateur
-        const { data: { user }, error: userError } = await supabase.auth.getUser()
-        
-        if (!mounted) return
-
-        if (userError) {
-          console.error('Erreur lors de la récupération de l\'utilisateur:', userError)
-          if (!sessionChecked) {
-            router.push('/auth/login')
-          }
-          return
-        }
-
-        setUser(user)
-        setSessionChecked(true)
-      } catch (error) {
-        console.error('Erreur inattendue:', error)
-        if (!sessionChecked) {
-          router.push('/auth/login')
-        }
+        if (error) throw error
+        setProperties(data || [])
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Une erreur est survenue')
       } finally {
-        if (mounted) {
-          setLoading(false)
-        }
+        setLoading(false)
       }
     }
 
-    getUser()
-
-    return () => {
-      mounted = false
-    }
-  }, [router, sessionChecked])
-
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut()
-      router.push('/')
-      router.refresh()
-    } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error)
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Chargement...</p>
-        </div>
-      </div>
-    )
-  }
+    fetchProperties()
+  }, [])
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
-          >
-            Se déconnecter
-          </button>
-        </div>
-        {user && (
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Informations utilisateur</h2>
-            <p><strong>Email:</strong> {user.email}</p>
-            <p><strong>ID:</strong> {user.id}</p>
+    <AuthGuard>
+      <MainLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Tableau de bord</h1>
+            <Link href="/dashboard/add">
+              <Button>Ajouter une propriété</Button>
+            </Link>
           </div>
-        )}
-      </div>
-    </div>
+
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Chargement des propriétés...</p>
+            </div>
+          ) : error ? (
+            <Card>
+              <div className="text-red-600">{error}</div>
+            </Card>
+          ) : properties.length === 0 ? (
+            <Card>
+              <div className="text-center py-12">
+                <p className="text-gray-600">Aucune propriété trouvée</p>
+                <Link href="/dashboard/add" className="mt-4 inline-block">
+                  <Button>Ajouter votre première propriété</Button>
+                </Link>
+              </div>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {properties.map((property) => (
+                <Link key={property.id} href={`/dashboard/property/${property.id}`}>
+                  <Card className="h-full hover:shadow-lg transition-shadow">
+                    <div className="p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                        {property.name}
+                      </h3>
+                      <p className="text-gray-600 mb-4">{property.address}</p>
+                      <div className="flex justify-between text-sm text-gray-500">
+                        <span>Type: {property.type}</span>
+                        <span>Surface: {property.surface}m²</span>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </MainLayout>
+    </AuthGuard>
   )
 }
