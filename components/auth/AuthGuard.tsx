@@ -14,15 +14,36 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
 
   useEffect(() => {
+    let mounted = true;
+
     const checkAuth = async () => {
       try {
-        const { data, error } = await supabase.auth.getSession();
+        // Vérifier la session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (error) {
-          throw error;
+        if (sessionError) {
+          throw sessionError;
         }
 
-        if (!data.session) {
+        if (!mounted) return;
+
+        if (!session) {
+          console.log('Aucune session trouvée, redirection vers login');
+          router.push('/auth/login');
+          return;
+        }
+
+        // Vérifier l'utilisateur
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError) {
+          throw userError;
+        }
+
+        if (!mounted) return;
+
+        if (!user) {
+          console.log('Aucun utilisateur trouvé, redirection vers login');
           router.push('/auth/login');
           return;
         }
@@ -30,9 +51,13 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         setIsAuthenticated(true);
       } catch (error) {
         console.error('Erreur lors de la vérification de l\'authentification:', error);
-        router.push('/auth/login');
+        if (mounted) {
+          router.push('/auth/login');
+        }
       } finally {
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -40,7 +65,10 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!mounted) return;
+
         if (event === 'SIGNED_OUT') {
+          setIsAuthenticated(false);
           router.push('/auth/login');
         } else if (event === 'SIGNED_IN' && session) {
           setIsAuthenticated(true);
@@ -49,6 +77,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     );
 
     return () => {
+      mounted = false;
       authListener.subscription.unsubscribe();
     };
   }, [router]);

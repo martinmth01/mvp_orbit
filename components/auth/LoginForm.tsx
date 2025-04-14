@@ -18,15 +18,24 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
       
-      router.push('/dashboard');
-      router.refresh();
+      // Attendre que la session soit disponible
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) throw sessionError;
+      
+      if (session) {
+        // Rediriger vers le dashboard
+        router.push('/dashboard');
+      } else {
+        throw new Error('Session non disponible après la connexion');
+      }
     } catch (error: any) {
       setError(error.message || 'Une erreur est survenue lors de la connexion');
     } finally {
