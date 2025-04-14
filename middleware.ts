@@ -10,6 +10,7 @@ export async function middleware(req: NextRequest) {
 
     const {
       data: { session },
+      error
     } = await supabase.auth.getSession()
 
     console.log('Middleware - Path:', req.nextUrl.pathname)
@@ -17,11 +18,15 @@ export async function middleware(req: NextRequest) {
     if (session) {
       console.log('Middleware - User ID:', session.user.id)
     }
+    if (error) {
+      console.error('Middleware - Auth error:', error)
+    }
 
     // Si l'utilisateur n'est pas connecté et essaie d'accéder au dashboard
     if (!session && req.nextUrl.pathname.startsWith('/dashboard')) {
       console.log('Middleware - Redirecting to login (no session)')
       const redirectUrl = new URL('/auth/login', req.url)
+      redirectUrl.searchParams.set('redirect', req.nextUrl.pathname)
       return NextResponse.redirect(redirectUrl)
     }
 
@@ -35,7 +40,10 @@ export async function middleware(req: NextRequest) {
     return res
   } catch (error) {
     console.error('Middleware error:', error)
-    return NextResponse.next()
+    // En cas d'erreur, on redirige vers la page de login
+    const redirectUrl = new URL('/auth/login', req.url)
+    redirectUrl.searchParams.set('error', 'Une erreur est survenue')
+    return NextResponse.redirect(redirectUrl)
   }
 }
 
