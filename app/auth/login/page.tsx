@@ -1,9 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
+import AuthNav from '@/app/components/AuthNav'
+import Link from 'next/link'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -22,8 +26,8 @@ export default function LoginPage() {
 
       if (error) throw error
       
-      // Redirection après connexion réussie
-      window.location.href = '/dashboard'
+      // Utilisation de router.push au lieu de window.location
+      router.push('/dashboard')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue')
     } finally {
@@ -37,6 +41,9 @@ export default function LoginPage() {
         <div>
           <h2 className="text-2xl font-bold text-center">Connexion</h2>
         </div>
+        
+        <AuthNav />
+        
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           {error && (
             <div className="bg-red-50 text-red-500 p-3 rounded">
@@ -72,10 +79,19 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors duration-200"
           >
             {loading ? 'Connexion...' : 'Se connecter'}
           </button>
+          
+          <div className="text-center mt-4">
+            <p className="text-sm text-gray-600">
+              Pas encore de compte ?{' '}
+              <Link href="/auth/register" className="text-blue-600 hover:underline transition-colors duration-200">
+                S'inscrire
+              </Link>
+            </p>
+          </div>
         </form>
       </div>
     </div>
