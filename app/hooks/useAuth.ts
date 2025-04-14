@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import { User, Session } from '@supabase/supabase-js'
@@ -8,7 +8,8 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
-  const [isRedirecting, setIsRedirecting] = useState(false)
+  const isRedirectingRef = useRef(false)
+  const lastEventRef = useRef<string | null>(null)
 
   useEffect(() => {
     // Vérifier la session actuelle
@@ -17,6 +18,12 @@ export function useAuth() {
         const { data: { session } } = await supabase.auth.getSession()
         setSession(session)
         setUser(session?.user ?? null)
+        
+        // Si l'utilisateur est connecté et n'est pas sur le dashboard, rediriger
+        if (session && window.location.pathname !== '/dashboard') {
+          console.log('Session existante détectée, redirection vers le dashboard')
+          window.location.href = '/dashboard'
+        }
       } catch (error) {
         console.error('Erreur lors de la vérification de la session:', error)
       } finally {
@@ -30,30 +37,34 @@ export function useAuth() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Événement d\'authentification:', event)
+        
+        // Éviter les événements en double
+        if (event === lastEventRef.current) {
+          console.log('Événement en double ignoré:', event)
+          return
+        }
+        
+        lastEventRef.current = event
         setSession(session)
         setUser(session?.user ?? null)
         
-        if (event === 'SIGNED_IN' && !isRedirecting) {
+        if (event === 'SIGNED_IN' && !isRedirectingRef.current) {
           console.log('Utilisateur connecté, redirection vers le dashboard')
-          setIsRedirecting(true)
+          isRedirectingRef.current = true
           
           // Vérifier si nous sommes déjà sur le dashboard
           if (window.location.pathname !== '/dashboard') {
-            // Attendre un court instant avant de rediriger
-            setTimeout(() => {
-              window.location.href = '/dashboard'
-            }, 100)
+            // Redirection directe
+            window.location.href = '/dashboard'
           }
-        } else if (event === 'SIGNED_OUT' && !isRedirecting) {
+        } else if (event === 'SIGNED_OUT' && !isRedirectingRef.current) {
           console.log('Utilisateur déconnecté, redirection vers la page d\'accueil')
-          setIsRedirecting(true)
+          isRedirectingRef.current = true
           
           // Vérifier si nous sommes déjà sur la page d'accueil
           if (window.location.pathname !== '/') {
-            // Attendre un court instant avant de rediriger
-            setTimeout(() => {
-              window.location.href = '/'
-            }, 100)
+            // Redirection directe
+            window.location.href = '/'
           }
         }
       }
@@ -62,10 +73,14 @@ export function useAuth() {
     return () => {
       subscription.unsubscribe()
     }
-  }, [isRedirecting])
+  }, [])
 
   const signIn = async (email: string, password: string) => {
     try {
+      // Réinitialiser l'état de redirection
+      isRedirectingRef.current = false
+      lastEventRef.current = null
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -81,6 +96,10 @@ export function useAuth() {
 
   const signOut = async () => {
     try {
+      // Réinitialiser l'état de redirection
+      isRedirectingRef.current = false
+      lastEventRef.current = null
+      
       const { error } = await supabase.auth.signOut()
       if (error) throw error
       
