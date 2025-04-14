@@ -19,17 +19,23 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log('Tentative de connexion avec:', email)
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (error) throw error
+      if (error) {
+        console.error('Erreur de connexion:', error.message)
+        throw error
+      }
       
+      console.log('Connexion réussie:', data)
       // Utilisation de router.push au lieu de window.location
       router.push('/dashboard')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue')
+      console.error('Erreur détaillée:', err)
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de la connexion')
     } finally {
       setLoading(false)
     }
