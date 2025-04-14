@@ -3,7 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LogoutButton } from '../auth';
+import { useAuth } from '@/lib/hooks/useAuth';
+import LogoutButton from '../auth/LogoutButton';
 
 interface NavItem {
   label: string;
@@ -17,6 +18,7 @@ interface NavbarProps {
 
 export default function Navbar({ items = [], isLoggedIn = false }: NavbarProps) {
   const pathname = usePathname();
+  const { user } = useAuth();
   
   const defaultItems: NavItem[] = [
     { label: 'Accueil', href: '/' },
@@ -59,8 +61,14 @@ export default function Navbar({ items = [], isLoggedIn = false }: NavbarProps) 
               ))}
             </div>
           </div>
-          {isLoggedIn && (
-            <div className="flex items-center">
+          {user && (
+            <div className="flex items-center space-x-4">
+              <Link 
+                href="/dashboard"
+                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+              >
+                Tableau de bord
+              </Link>
               <LogoutButton />
             </div>
           )}

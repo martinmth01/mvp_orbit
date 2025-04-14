@@ -1,38 +1,56 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Button } from '../ui';
-import { supabase } from '@/lib/supabaseClient';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { Button } from '../ui';
 
 export default function LogoutButton() {
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const supabase = createClientComponentClient();
 
-  const handleLogout = async () => {
-    setLoading(true);
-    
+  const handleSignOut = async () => {
+    if (!window.confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
     try {
       const { error } = await supabase.auth.signOut();
-      
       if (error) throw error;
+
+      // Nettoyer le stockage local
+      localStorage.removeItem('sb-fjzlelgmesryqifksbhe-auth-token');
       
-      router.push('/');
-      router.refresh();
+      // Rediriger vers la page de connexion
+      router.push('/auth/login');
     } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error);
+      setError(error instanceof Error ? error.message : 'Une erreur est survenue lors de la déconnexion');
+      console.error('Erreur de déconnexion:', error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <Button 
-      variant="outline" 
-      onClick={handleLogout}
-      disabled={loading}
-    >
-      {loading ? 'Déconnexion...' : 'Se déconnecter'}
-    </Button>
+    <div className="relative">
+      <Button
+        onClick={handleSignOut}
+        variant="outline"
+        className="text-gray-700 hover:text-gray-900"
+        disabled={isLoading}
+      >
+        {isLoading ? 'Déconnexion...' : 'Déconnexion'}
+      </Button>
+      {error && (
+        <div className="absolute top-full left-0 mt-1 text-red-500 text-sm">
+          {error}
+        </div>
+      )}
+    </div>
   );
 } 
