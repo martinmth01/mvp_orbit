@@ -38,10 +38,9 @@ export default function LoginPage() {
       }
       
       console.log('Connexion réussie:', data)
-      // Attendre que la session soit bien établie
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 500)
+      // Rafraîchir le router et rediriger
+      router.refresh()
+      router.push('/dashboard')
     } catch (err) {
       console.error('Erreur détaillée:', err)
       setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de la connexion')
