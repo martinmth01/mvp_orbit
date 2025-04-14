@@ -1,11 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
+import { Redirect } from '@/app/components/Redirect'
 
 export function RedirectOnLogin() {
-  const router = useRouter()
   const [shouldRedirect, setShouldRedirect] = useState(false)
 
   useEffect(() => {
@@ -36,14 +35,10 @@ export function RedirectOnLogin() {
     }
   }, [])
 
-  // Effet séparé pour la redirection
-  useEffect(() => {
-    if (shouldRedirect) {
-      console.log('Executing redirect to dashboard')
-      router.push('/dashboard')
-      router.refresh()
-    }
-  }, [shouldRedirect, router])
+  // Si l'utilisateur est connecté, on redirige
+  if (shouldRedirect) {
+    return <Redirect to="/dashboard" />
+  }
 
   return null
 } 
