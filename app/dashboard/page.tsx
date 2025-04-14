@@ -7,19 +7,66 @@ import { useRouter } from 'next/navigation'
 export default function DashboardPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
+      try {
+        // Attendre que la session soit initialisée
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
+        if (sessionError) {
+          console.error('Erreur lors de la récupération de la session:', sessionError)
+          router.push('/auth/login')
+          return
+        }
+
+        if (!session) {
+          console.log('Aucune session trouvée, redirection vers login')
+          router.push('/auth/login')
+          return
+        }
+
+        // Récupérer les informations de l'utilisateur
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
+        
+        if (userError) {
+          console.error('Erreur lors de la récupération de l\'utilisateur:', userError)
+          router.push('/auth/login')
+          return
+        }
+
+        setUser(user)
+      } catch (error) {
+        console.error('Erreur inattendue:', error)
+        router.push('/auth/login')
+      } finally {
+        setLoading(false)
+      }
     }
+
     getUser()
-  }, [])
+  }, [router])
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/')
-    router.refresh()
+    try {
+      await supabase.auth.signOut()
+      router.push('/')
+      router.refresh()
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
