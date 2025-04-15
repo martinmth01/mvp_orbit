@@ -31,6 +31,10 @@ export interface NavigationItem {
 export interface PropertyData {
   id: string;
   owner_id: string;
+  name: string;
+  address: string;
+  price: number;
+  description: string;
   investment_goal: 'passive_income' | 'capital_growth' | 'portfolio_diversification';
   experience_level: 'beginner' | 'intermediate' | 'advanced';
   risk_tolerance: 'conservative' | 'moderate' | 'aggressive';

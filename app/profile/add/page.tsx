@@ -21,7 +21,7 @@ export default function AddPropertyPage() {
     try {
       const formData = new FormData(e.currentTarget);
       const propertyData = {
-        user_id: user.id,
+        owner_id: user.id,
         name: formData.get('name'),
         address: formData.get('address'),
         price: parseFloat(formData.get('price') as string),
@@ -35,14 +35,20 @@ export default function AddPropertyPage() {
         created_at: new Date().toISOString(),
       };
 
+      console.log('Données à envoyer à Supabase:', propertyData);
+
       const { error } = await supabase
         .from('properties')
         .insert([propertyData]);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erreur Supabase:', error);
+        throw error;
+      }
 
       router.push('/profile');
     } catch (err) {
+      console.error('Erreur complète:', err);
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
     } finally {
       setLoading(false);
@@ -123,9 +129,9 @@ export default function AddPropertyPage() {
             required
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           >
-            <option value="rental">Location</option>
-            <option value="flip">Rénovation et revente</option>
-            <option value="long_term">Investissement long terme</option>
+            <option value="passive_income">Revenu passif</option>
+            <option value="capital_growth">Croissance du capital</option>
+            <option value="portfolio_diversification">Diversification du portefeuille</option>
           </select>
         </div>
 
@@ -141,7 +147,7 @@ export default function AddPropertyPage() {
           >
             <option value="beginner">Débutant</option>
             <option value="intermediate">Intermédiaire</option>
-            <option value="expert">Expert</option>
+            <option value="advanced">Avancé</option>
           </select>
         </div>
 
@@ -155,9 +161,9 @@ export default function AddPropertyPage() {
             required
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           >
-            <option value="low">Faible</option>
-            <option value="medium">Moyenne</option>
-            <option value="high">Élevée</option>
+            <option value="conservative">Conservateur</option>
+            <option value="moderate">Modéré</option>
+            <option value="aggressive">Agressif</option>
           </select>
         </div>
 
@@ -171,9 +177,9 @@ export default function AddPropertyPage() {
             required
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           >
-            <option value="short">Court terme (1-3 ans)</option>
-            <option value="medium">Moyen terme (3-7 ans)</option>
-            <option value="long">Long terme (7+ ans)</option>
+            <option value="short_term">Court terme (1-3 ans)</option>
+            <option value="medium_term">Moyen terme (3-7 ans)</option>
+            <option value="long_term">Long terme (7+ ans)</option>
           </select>
         </div>
 
@@ -202,10 +208,10 @@ export default function AddPropertyPage() {
             required
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           >
-            <option value="apartment">Appartement</option>
-            <option value="house">Maison</option>
+            <option value="residential">Résidentiel</option>
             <option value="commercial">Commercial</option>
-            <option value="land">Terrain</option>
+            <option value="fix_and_flip">Rénovation et revente</option>
+            <option value="rental">Location</option>
           </select>
         </div>
 

@@ -101,7 +101,7 @@ export default function ProfilePage() {
                         <span className="text-blue-600 font-medium">
                           {property.price.toLocaleString('fr-FR')} €
                         </span>
-                        <Link href={`/properties/${property.id}`}>
+                        <Link href={`/profile/property/${property.id}`}>
                           <Button variant="outline">Voir les détails</Button>
                         </Link>
                       </div>
