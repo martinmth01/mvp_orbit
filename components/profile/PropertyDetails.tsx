@@ -41,10 +41,56 @@ export default function PropertyDetails({ property, onClose }: PropertyDetailsPr
     }
   };
 
+  const getInvestmentGoalLabel = (goal: string) => {
+    switch (goal) {
+      case 'passive_income': return 'Revenu passif';
+      case 'capital_growth': return 'Croissance du capital';
+      case 'portfolio_diversification': return 'Diversification du portefeuille';
+      default: return goal;
+    }
+  };
+
+  const getExperienceLevelLabel = (level: string) => {
+    switch (level) {
+      case 'beginner': return 'Débutant';
+      case 'intermediate': return 'Intermédiaire';
+      case 'advanced': return 'Avancé';
+      default: return level;
+    }
+  };
+
+  const getRiskToleranceLabel = (risk: string) => {
+    switch (risk) {
+      case 'conservative': return 'Conservateur';
+      case 'moderate': return 'Modéré';
+      case 'aggressive': return 'Agressif';
+      default: return risk;
+    }
+  };
+
+  const getInvestmentHorizonLabel = (horizon: string) => {
+    switch (horizon) {
+      case 'short_term': return 'Court terme';
+      case 'medium_term': return 'Moyen terme';
+      case 'long_term': return 'Long terme';
+      default: return horizon;
+    }
+  };
+
+  const getPropertyTypeLabel = (type: string) => {
+    switch (type) {
+      case 'residential': return 'Résidentiel';
+      case 'commercial': return 'Commercial';
+      case 'fix_and_flip': return 'Rénovation et revente';
+      case 'rental': return 'Location';
+      default: return type;
+    }
+  };
+
   return (
     <Card className="p-6">
       <div className="flex justify-between items-start mb-4">
-        <h2 className="text-2xl font-bold">{property.name}</h2>
+        <h2 className="text-2xl font-bold">Détails de l'investissement</h2>
         {onClose && (
           <Button
             variant="outline"
@@ -58,34 +104,35 @@ export default function PropertyDetails({ property, onClose }: PropertyDetailsPr
 
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-semibold mb-2">Description</h3>
-          <p className="text-gray-600">{property.description}</p>
+          <h3 className="text-lg font-semibold mb-2">Objectif d'investissement</h3>
+          <p className="text-gray-600">{getInvestmentGoalLabel(property.investment_goal)}</p>
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold mb-2">Prix</h3>
+          <h3 className="text-lg font-semibold mb-2">Niveau d'expérience</h3>
+          <p className="text-gray-600">{getExperienceLevelLabel(property.experience_level)}</p>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Tolérance au risque</h3>
+          <p className="text-gray-600">{getRiskToleranceLabel(property.risk_tolerance)}</p>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Horizon d'investissement</h3>
+          <p className="text-gray-600">{getInvestmentHorizonLabel(property.investment_horizon)}</p>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Capital disponible</h3>
           <p className="text-blue-600 font-medium">
-            {property.price.toLocaleString('fr-FR')} €
+            {property.available_capital.toLocaleString('fr-FR')} €
           </p>
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold mb-2">Adresse</h3>
-          <p className="text-gray-600">
-            {property.address}<br />
-            {property.postalCode} {property.city}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Surface</h3>
-            <p className="text-gray-600">{property.surface} m²</p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Pièces</h3>
-            <p className="text-gray-600">{property.rooms}</p>
-          </div>
+          <h3 className="text-lg font-semibold mb-2">Type de propriété</h3>
+          <p className="text-gray-600">{getPropertyTypeLabel(property.property_type)}</p>
         </div>
 
         {error && (

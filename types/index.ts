@@ -30,16 +30,13 @@ export interface NavigationItem {
 
 export interface PropertyData {
   id: string;
-  name: string;
-  description: string;
-  price: number;
-  address: string;
-  city: string;
-  postalCode: string;
-  surface: number;
-  rooms: number;
-  type: string;
+  owner_id: string;
+  investment_goal: 'passive_income' | 'capital_growth' | 'portfolio_diversification';
+  experience_level: 'beginner' | 'intermediate' | 'advanced';
+  risk_tolerance: 'conservative' | 'moderate' | 'aggressive';
+  investment_horizon: 'short_term' | 'medium_term' | 'long_term';
+  available_capital: number;
+  property_type: 'residential' | 'commercial' | 'fix_and_flip' | 'rental';
   created_at: string;
   updated_at: string;
-  owner_id: string;
 } 

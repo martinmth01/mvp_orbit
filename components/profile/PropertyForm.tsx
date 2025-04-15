@@ -6,38 +6,32 @@ import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 
 interface PropertyFormData {
-  name: string;
-  description: string;
-  price: number;
-  address: string;
-  city: string;
-  postalCode: string;
-  surface: number;
-  rooms: number;
+  investment_goal: 'passive_income' | 'capital_growth' | 'portfolio_diversification';
+  experience_level: 'beginner' | 'intermediate' | 'advanced';
+  risk_tolerance: 'conservative' | 'moderate' | 'aggressive';
+  investment_horizon: 'short_term' | 'medium_term' | 'long_term';
+  available_capital: number;
+  property_type: 'residential' | 'commercial' | 'fix_and_flip' | 'rental';
 }
 
 export default function PropertyForm() {
   const [formData, setFormData] = useState<PropertyFormData>({
-    name: '',
-    description: '',
-    price: 0,
-    address: '',
-    city: '',
-    postalCode: '',
-    surface: 0,
-    rooms: 0
+    investment_goal: 'passive_income',
+    experience_level: 'beginner',
+    risk_tolerance: 'moderate',
+    investment_horizon: 'medium_term',
+    available_capital: 0,
+    property_type: 'residential'
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'price' || name === 'surface' || name === 'rooms' 
-        ? parseFloat(value) || 0 
-        : value
+      [name]: name === 'available_capital' ? parseFloat(value) || 0 : value
     }));
   };
 
@@ -78,115 +72,109 @@ export default function PropertyForm() {
       <h2 className="text-2xl font-bold mb-6">Ajouter une propriété</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            Nom de la propriété
+          <label htmlFor="investment_goal" className="block text-sm font-medium text-gray-700">
+            Objectif d'investissement
           </label>
-          <Input
-            id="name"
-            name="name"
-            type="text"
-            value={formData.name}
+          <select
+            id="investment_goal"
+            name="investment_goal"
+            value={formData.investment_goal}
             onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             required
-          />
+          >
+            <option value="passive_income">Revenu passif</option>
+            <option value="capital_growth">Croissance du capital</option>
+            <option value="portfolio_diversification">Diversification du portefeuille</option>
+          </select>
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-            Description
+          <label htmlFor="experience_level" className="block text-sm font-medium text-gray-700">
+            Niveau d'expérience
           </label>
-          <Input
-            id="description"
-            name="description"
-            type="text"
-            value={formData.description}
+          <select
+            id="experience_level"
+            name="experience_level"
+            value={formData.experience_level}
             onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             required
-          />
+          >
+            <option value="beginner">Débutant</option>
+            <option value="intermediate">Intermédiaire</option>
+            <option value="advanced">Avancé</option>
+          </select>
         </div>
 
         <div>
-          <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-            Prix (€)
+          <label htmlFor="risk_tolerance" className="block text-sm font-medium text-gray-700">
+            Tolérance au risque
+          </label>
+          <select
+            id="risk_tolerance"
+            name="risk_tolerance"
+            value={formData.risk_tolerance}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            required
+          >
+            <option value="conservative">Conservateur</option>
+            <option value="moderate">Modéré</option>
+            <option value="aggressive">Agressif</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="investment_horizon" className="block text-sm font-medium text-gray-700">
+            Horizon d'investissement
+          </label>
+          <select
+            id="investment_horizon"
+            name="investment_horizon"
+            value={formData.investment_horizon}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            required
+          >
+            <option value="short_term">Court terme</option>
+            <option value="medium_term">Moyen terme</option>
+            <option value="long_term">Long terme</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="available_capital" className="block text-sm font-medium text-gray-700">
+            Capital disponible (€)
           </label>
           <Input
-            id="price"
-            name="price"
+            id="available_capital"
+            name="available_capital"
             type="number"
-            value={formData.price}
+            value={formData.available_capital}
             onChange={handleChange}
             required
+            min="0"
           />
         </div>
 
         <div>
-          <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-            Adresse
+          <label htmlFor="property_type" className="block text-sm font-medium text-gray-700">
+            Type de propriété
           </label>
-          <Input
-            id="address"
-            name="address"
-            type="text"
-            value={formData.address}
+          <select
+            id="property_type"
+            name="property_type"
+            value={formData.property_type}
             onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-            Ville
-          </label>
-          <Input
-            id="city"
-            name="city"
-            type="text"
-            value={formData.city}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">
-            Code postal
-          </label>
-          <Input
-            id="postalCode"
-            name="postalCode"
-            type="text"
-            value={formData.postalCode}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="surface" className="block text-sm font-medium text-gray-700">
-            Surface (m²)
-          </label>
-          <Input
-            id="surface"
-            name="surface"
-            type="number"
-            value={formData.surface}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="rooms" className="block text-sm font-medium text-gray-700">
-            Nombre de pièces
-          </label>
-          <Input
-            id="rooms"
-            name="rooms"
-            type="number"
-            value={formData.rooms}
-            onChange={handleChange}
-            required
-          />
+          >
+            <option value="residential">Résidentiel</option>
+            <option value="commercial">Commercial</option>
+            <option value="fix_and_flip">Rénovation et revente</option>
+            <option value="rental">Location</option>
+          </select>
         </div>
 
         {error && (
