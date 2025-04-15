@@ -28,7 +28,7 @@ export default function Navbar({ items = [], isLoggedIn = false }: NavbarProps) 
           { label: 'Inscription', href: '/auth/register' }
         ] 
       : [
-          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'Profile', href: '/profile' },
         ]
     )
   ];

@@ -12,7 +12,7 @@ export default function LoginForm() {
   const [formError, setFormError] = useState<string | null>(null);
   const { signIn, loading, error: authError } = useAuth();
   const searchParams = useSearchParams();
-  const returnTo = searchParams.get('returnTo') || '/dashboard';
+  const returnTo = searchParams.get('returnTo') || '/profile';
 
   // Fonction pour vérifier et créer le profil utilisateur si nécessaire
   const ensureUserProfile = async (userId: string, userEmail: string) => {

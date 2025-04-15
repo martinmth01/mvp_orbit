@@ -39,7 +39,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
           password,
         });
         if (error) throw error;
-        router.push('/dashboard');
+        router.push('/profile');
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Une erreur est survenue');

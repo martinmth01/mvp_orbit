@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // Liste des chemins protégés qui nécessitent une authentification
-    const protectedPaths = ['/dashboard', '/dashboard/add', '/dashboard/property']
+    const protectedPaths = ['/profile', '/profile/add', '/profile/property']
   
     // Vérifier si le chemin actuel est protégé
     const isProtectedPath = protectedPaths.some(path => 
@@ -43,8 +43,8 @@ export async function middleware(request: NextRequest) {
 
     // Si l'utilisateur est sur la page de connexion mais qu'il est déjà authentifié, le rediriger vers le tableau de bord
     if ((request.nextUrl.pathname === '/auth/login' || request.nextUrl.pathname === '/auth/register') && session) {
-      console.log('Middleware - Utilisateur déjà authentifié, redirection vers dashboard')
-      return NextResponse.redirect(new URL('/dashboard', request.url))
+      console.log('Middleware - Utilisateur déjà authentifié, redirection vers profile')
+      return NextResponse.redirect(new URL('/profile', request.url))
     }
 
     return res
@@ -57,5 +57,5 @@ export async function middleware(request: NextRequest) {
 
 // Configuration pour que le middleware s'exécute uniquement sur les chemins spécifiés
 export const config = {
-  matcher: ['/dashboard/:path*', '/auth/login', '/auth/register'],
+  matcher: ['/profile/:path*', '/auth/login', '/auth/register'],
 }

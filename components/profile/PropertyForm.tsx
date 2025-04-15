@@ -64,7 +64,7 @@ export default function PropertyForm() {
 
       if (error) throw error;
 
-      router.push('/dashboard');
+      router.push('/profile');
       router.refresh();
     } catch (err: any) {
       setError(err.message || 'Une erreur est survenue lors de l\'ajout de la propriété');
@@ -74,100 +74,132 @@ export default function PropertyForm() {
   };
 
   return (
-    <Card title="Ajouter une propriété" className="max-w-2xl mx-auto">
+    <Card className="p-6">
+      <h2 className="text-2xl font-bold mb-6">Ajouter une propriété</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {error && (
-          <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">
-            {error}
-          </div>
-        )}
-
-        <Input
-          label="Nom de la propriété"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Ex: Appartement T3 Centre-ville"
-          required
-        />
-
-        <Input
-          label="Description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="Description détaillée de la propriété"
-          required
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            Nom de la propriété
+          </label>
           <Input
-            label="Prix (€)"
+            id="name"
+            name="name"
+            type="text"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            Description
+          </label>
+          <Input
+            id="description"
+            name="description"
+            type="text"
+            value={formData.description}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+            Prix (€)
+          </label>
+          <Input
+            id="price"
             name="price"
             type="number"
             value={formData.price}
             onChange={handleChange}
-            placeholder="Ex: 250000"
             required
           />
+        </div>
 
+        <div>
+          <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+            Adresse
+          </label>
           <Input
-            label="Surface (m²)"
+            id="address"
+            name="address"
+            type="text"
+            value={formData.address}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+            Ville
+          </label>
+          <Input
+            id="city"
+            name="city"
+            type="text"
+            value={formData.city}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">
+            Code postal
+          </label>
+          <Input
+            id="postalCode"
+            name="postalCode"
+            type="text"
+            value={formData.postalCode}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="surface" className="block text-sm font-medium text-gray-700">
+            Surface (m²)
+          </label>
+          <Input
+            id="surface"
             name="surface"
             type="number"
             value={formData.surface}
             onChange={handleChange}
-            placeholder="Ex: 75"
             required
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="rooms" className="block text-sm font-medium text-gray-700">
+            Nombre de pièces
+          </label>
           <Input
-            label="Adresse"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            placeholder="Ex: 123 rue de la Paix"
-            required
-          />
-
-          <Input
-            label="Code postal"
-            name="postalCode"
-            value={formData.postalCode}
-            onChange={handleChange}
-            placeholder="Ex: 75001"
-            required
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="Ville"
-            name="city"
-            value={formData.city}
-            onChange={handleChange}
-            placeholder="Ex: Paris"
-            required
-          />
-
-          <Input
-            label="Nombre de pièces"
+            id="rooms"
             name="rooms"
             type="number"
             value={formData.rooms}
             onChange={handleChange}
-            placeholder="Ex: 3"
             required
           />
         </div>
 
-        <div className="pt-2">
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? 'Ajout en cours...' : 'Ajouter la propriété'}
-          </Button>
-        </div>
+        {error && (
+          <div className="text-red-500 text-sm">{error}</div>
+        )}
+
+        <Button
+          type="submit"
+          disabled={loading}
+          className="w-full"
+        >
+          {loading ? 'Ajout en cours...' : 'Ajouter la propriété'}
+        </Button>
       </form>
     </Card>
   );
