@@ -49,8 +49,8 @@ export default function Home() {
             <p className="text-gray-600 mb-4">
               Ajoutez, modifiez et suivez vos propriétés en un seul endroit.
             </p>
-            <Link href="/dashboard" className="text-blue-600 hover:text-blue-800 font-medium">
-              Accéder au tableau de bord →
+            <Link href="/profile" className="text-blue-600 hover:text-blue-800 font-medium">
+              Accéder au profil →
             </Link>
           </Card>
 
