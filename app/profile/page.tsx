@@ -44,7 +44,22 @@ export default function ProfilePage() {
         }
 
         console.log('Propriétés récupérées avec succès:', data?.length || 0);
-        setProperties(data || []);
+        setProperties((data || []).map(property => ({
+          id: property.id as string,
+          owner_id: property.owner_id as string,
+          name: property.name as string,
+          address: property.address as string,
+          price: property.price as number,
+          description: property.description as string,
+          investment_goal: property.investment_goal as 'passive_income' | 'capital_growth' | 'portfolio_diversification',
+          experience_level: property.experience_level as 'beginner' | 'intermediate' | 'advanced',
+          risk_tolerance: property.risk_tolerance as 'conservative' | 'moderate' | 'aggressive',
+          investment_horizon: property.investment_horizon as 'short_term' | 'medium_term' | 'long_term',
+          available_capital: property.available_capital as number,
+          property_type: property.property_type as 'residential' | 'commercial' | 'fix_and_flip' | 'rental',
+          created_at: property.created_at as string,
+          updated_at: property.updated_at as string
+        })));
       } catch (error) {
         console.error('Erreur complète:', error);
         setError(error instanceof Error ? error.message : 'Une erreur est survenue lors de la récupération des propriétés');
