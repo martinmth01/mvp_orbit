@@ -22,13 +22,13 @@ export default function Navbar({ items = [], isLoggedIn = false }: NavbarProps) 
   
   const defaultItems: NavItem[] = [
     { label: 'Accueil', href: '/' },
-    ...(!isLoggedIn 
+    ...(!user 
       ? [
           { label: 'Connexion', href: '/auth/login' },
           { label: 'Inscription', href: '/auth/register' }
         ] 
       : [
-          { label: 'Profile', href: '/profile' },
+          { label: 'Profil', href: '/profile' }
         ]
     )
   ];
@@ -62,13 +62,7 @@ export default function Navbar({ items = [], isLoggedIn = false }: NavbarProps) 
             </div>
           </div>
           {user && (
-            <div className="flex items-center space-x-4">
-              <Link 
-                href="/profile"
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Profil
-              </Link>
+            <div className="flex items-center">
               <LogoutButton />
             </div>
           )}
