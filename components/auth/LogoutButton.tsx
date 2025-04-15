@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { Button } from '../ui';
+import Button from '../ui/Button';
 
 export default function LogoutButton() {
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +41,8 @@ export default function LogoutButton() {
       <Button
         onClick={handleSignOut}
         variant="outline"
-        className="text-gray-700 hover:text-gray-900"
+        size="sm"
+        className="text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white"
         disabled={isLoading}
       >
         {isLoading ? 'Déconnexion...' : 'Déconnexion'}

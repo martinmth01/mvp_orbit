@@ -8,6 +8,7 @@ interface ButtonProps {
   type?: 'button' | 'submit' | 'reset';
   disabled?: boolean;
   className?: string;
+  fullWidth?: boolean;
 }
 
 export default function Button({
@@ -18,29 +19,31 @@ export default function Button({
   type = 'button',
   disabled = false,
   className = '',
+  fullWidth = false,
 }: ButtonProps) {
-  const baseStyles = 'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2';
+  const baseStyles = 'btn';
   
   const variantStyles = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700 shadow',
-    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
-    outline: 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+    primary: 'btn-primary',
+    secondary: 'btn-secondary',
+    outline: 'btn-outline'
   };
   
   const sizeStyles = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-5 py-2.5 text-lg'
+    sm: 'btn-sm',
+    md: 'btn-md',
+    lg: 'btn-lg'
   };
   
   const disabledStyles = disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer';
+  const widthStyles = fullWidth ? 'w-full' : '';
   
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${disabledStyles} ${className}`}
+      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${disabledStyles} ${widthStyles} ${className}`}
     >
       {children}
     </button>

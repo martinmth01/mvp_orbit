@@ -5,19 +5,26 @@ interface CardProps {
   title?: string;
   footer?: React.ReactNode;
   className?: string;
+  hoverable?: boolean;
 }
 
-export default function Card({ children, title, footer, className = '' }: CardProps) {
+export default function Card({ 
+  children, 
+  title, 
+  footer, 
+  className = '',
+  hoverable = false
+}: CardProps) {
   return (
-    <div className={`bg-white rounded-lg shadow-md overflow-hidden ${className}`}>
+    <div className={`card ${hoverable ? 'hover:shadow-card-hover' : ''} ${className}`}>
       {title && (
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">{title}</h3>
+        <div className="px-6 py-4 border-b border-neutral-200 dark:border-neutral-700">
+          <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100">{title}</h3>
         </div>
       )}
       <div className="px-6 py-4">{children}</div>
       {footer && (
-        <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
+        <div className="px-6 py-3 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-200 dark:border-neutral-700">
           {footer}
         </div>
       )}

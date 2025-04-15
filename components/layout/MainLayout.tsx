@@ -40,21 +40,35 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex items-center justify-center min-h-screen bg-neutral-50 dark:bg-neutral-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navbar isLoggedIn={isLoggedIn} />
-      <main className="flex-grow">{children}</main>
-      <footer className="bg-white border-t border-gray-200 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-gray-500 text-sm">
-            &copy; {new Date().getFullYear()} Orbit Patrimoine. Tous droits réservés.
-          </p>
+    <div className="min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-900 transition-colors duration-300">
+      <Navbar isAuthenticated={isLoggedIn} />
+      <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
+        <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm p-6 transition-all duration-300">
+          {children}
+        </div>
+      </main>
+      <footer className="bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700 py-8 transition-colors duration-300">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm">
+              &copy; {new Date().getFullYear()} Orbit Patrimoine. Tous droits réservés.
+            </p>
+            <div className="flex space-x-6">
+              <a href="#" className="text-neutral-500 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400 transition-colors duration-200">
+                Mentions légales
+              </a>
+              <a href="#" className="text-neutral-500 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400 transition-colors duration-200">
+                Politique de confidentialité
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

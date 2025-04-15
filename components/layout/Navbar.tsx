@@ -6,68 +6,87 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
 import LogoutButton from '../auth/LogoutButton';
 
-interface NavItem {
-  label: string;
-  href: string;
-}
+type NavbarProps = {
+  isAuthenticated?: boolean;
+  onLogout?: () => void;
+};
 
-interface NavbarProps {
-  items?: NavItem[];
-  isLoggedIn?: boolean;
-}
-
-export default function Navbar({ items = [], isLoggedIn = false }: NavbarProps) {
+const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, onLogout }) => {
   const pathname = usePathname();
   const { user } = useAuth();
-  
-  const defaultItems: NavItem[] = [
-    { label: 'Accueil', href: '/' },
-    ...(!user 
-      ? [
-          { label: 'Connexion', href: '/auth/login' },
-          { label: 'Inscription', href: '/auth/register' }
-        ] 
-      : [
-          { label: 'Profil', href: '/profile' }
-        ]
-    )
-  ];
-
-  const navItems = items.length > 0 ? items : defaultItems;
+  const isUserAuthenticated = isAuthenticated !== undefined ? isAuthenticated : !!user;
 
   return (
-    <nav className="bg-white border-b border-gray-200">
+    <nav className="bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="text-xl font-bold text-blue-600">
+        <div className="flex justify-between items-center h-16">
+          {/* Left Section: Brand Logo/Name */}
+          <div className="flex-shrink-0">
+            <Link href="/" className="flex items-center space-x-2 group">
+              <div className="relative w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center overflow-hidden">
+                <div className="w-4 h-4 rounded-full bg-primary-500 dark:bg-primary-400 transform group-hover:scale-110 transition-transform duration-300"></div>
+              </div>
+              <span className="text-2xl font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-200">
                 Orbit Patrimoine
-              </Link>
-            </div>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                    pathname === item.href
-                      ? 'border-blue-500 text-gray-900'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+              </span>
+            </Link>
+          </div>
+
+          {/* Right Section: Navigation Links */}
+          <div className="flex space-x-4">
+            <Link 
+              href="/" 
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                pathname === '/' 
+                  ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400' 
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              Accueil
+            </Link>
+
+            {isUserAuthenticated ? (
+              <>
+                <Link 
+                  href="/profile" 
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                    pathname === '/profile' 
+                      ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400' 
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
-                  {item.label}
+                  Profil
                 </Link>
-              ))}
-            </div>
+                {onLogout ? (
+                  <button
+                    onClick={onLogout}
+                    className="px-4 py-2 rounded-md text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 transition-all duration-200"
+                  >
+                    Déconnexion
+                  </button>
+                ) : (
+                  <div className="px-4 py-2">
+                    <LogoutButton />
+                  </div>
+                )}
+              </>
+            ) : (
+              <Link 
+                href="/auth/login" 
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  pathname === '/auth/login' 
+                    ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400' 
+                    : 'bg-primary-50 text-primary-600 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/30'
+                }`}
+              >
+                Connexion / Inscription
+              </Link>
+            )}
           </div>
-          {user && (
-            <div className="flex items-center">
-              <LogoutButton />
-            </div>
-          )}
         </div>
       </div>
     </nav>
   );
-} 
+};
+
+export default Navbar; 

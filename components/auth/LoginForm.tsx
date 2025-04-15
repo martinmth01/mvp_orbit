@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button, Input, Card } from '../ui';
+import Button from '../ui/Button';
+import Input from '../ui/Input';
+import Card from '../ui/Card';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useSearchParams } from 'next/navigation';
 import { createUserProfile, getUserProfile } from '@/lib/userProfile';
@@ -45,10 +47,10 @@ export default function LoginForm() {
   };
 
   return (
-    <Card title="Connexion" className="max-w-md mx-auto">
+    <Card title="Connexion" className="max-w-md mx-auto" hoverable>
       <form onSubmit={handleLogin} className="space-y-4">
         {(formError || authError) && (
-          <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">
+          <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-md text-sm">
             {formError || authError?.message}
           </div>
         )}
@@ -73,8 +75,9 @@ export default function LoginForm() {
 
         <Button
           type="submit"
+          variant="primary"
+          fullWidth
           disabled={loading}
-          className="w-full"
         >
           {loading ? 'Connexion en cours...' : 'Se connecter'}
         </Button>

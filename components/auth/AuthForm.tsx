@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { Button, Input } from '../ui';
+import Button from '../ui/Button';
+import Input from '../ui/Input';
+import Card from '../ui/Card';
 
 interface AuthFormProps {
   mode: 'signin' | 'signup';
@@ -49,35 +51,38 @@ export default function AuthForm({ mode }: AuthFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-md">
-      <div className="space-y-2">
+    <Card title={mode === 'signup' ? 'Inscription' : 'Connexion'} className="max-w-md mx-auto" hoverable>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <Input
+          label="Email"
           type="email"
-          placeholder="Email"
+          placeholder="votre@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-      </div>
-      <div className="space-y-2">
         <Input
+          label="Mot de passe"
           type="password"
-          placeholder="Mot de passe"
+          placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-      </div>
-      {error && (
-        <div className="text-red-500 text-sm">{error}</div>
-      )}
-      <Button
-        type="submit"
-        disabled={loading}
-        className="w-full"
-      >
-        {loading ? 'Chargement...' : mode === 'signup' ? 'S\'inscrire' : 'Se connecter'}
-      </Button>
-    </form>
+        {error && (
+          <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-md text-sm">
+            {error}
+          </div>
+        )}
+        <Button
+          type="submit"
+          variant="primary"
+          fullWidth
+          disabled={loading}
+        >
+          {loading ? 'Chargement...' : mode === 'signup' ? 'S\'inscrire' : 'Se connecter'}
+        </Button>
+      </form>
+    </Card>
   );
 } 
